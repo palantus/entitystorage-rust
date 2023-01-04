@@ -55,5 +55,56 @@ fn search(){
   db.add(Person::new("Bo"));
   let persons = db.search::<Person, _>(|p| p.name == "Kim" || p.name == "Bo");
   let names: String = persons.iter().map(|p| p.data.name.clone()).into_iter().collect();
-  assert_eq!(names, "KimBo");
+  assert!(names == "KimBo" || names == "BoKim");
+}
+
+#[test]
+fn all(){
+  let mut db = EntityDB::new();
+  db.add(Person::new("Anders"));
+  db.add(Person::new("Kim"));
+  db.add(Person::new("Bo"));
+  db.add(Point::new(123, 5));
+  let persons = db.all::<Person>();
+  assert_eq!(persons.len(), 3);
+}
+
+#[test]
+fn user_roles(){
+
+  use entitystorage::{Deserialize, Serialize, Rels};
+  #[derive(Serialize, Deserialize, Clone)]
+  struct Role{
+    name: &'static str,
+    permissions: Vec<&'static str>
+  }
+  #[derive(Serialize, Deserialize, Clone)]
+  struct User{
+    name: &'static str,
+    roles: Rels
+  }
+
+  let mut db = EntityDB::new();
+  db.add(User{name: "Anders", roles: Rels::new()});
+  let mut user = db.lookup_id::<User>(1).unwrap();
+  user.data.roles.add(&db.add(Role{name: "Admin", permissions: vec!["user.add", "user.delete"]}));
+  db.save(user);
+  let user = db.lookup_id::<User>(1).unwrap();
+  assert_eq!(user.data.roles.resolve_first::<Role>(&db).unwrap().data.name, "Admin");
+}
+
+#[test]
+fn chaining_and_rels(){
+  let mut db = EntityDB::new();
+  let mut person = db.add(Person::new("Anders"));
+  person
+    .data
+    .points
+    .add(&db.add(Point::new(1, 2)));
+
+  db.save(person);  
+  let person = db.lookup_id::<Person>(1).unwrap();
+  assert_eq!(person.data.points.resolve_first::<Point>(&db).unwrap().data.y, 2);
+  assert_eq!(person.data.points.resolve::<Point>(&db).len(), 1);
+  
 }
