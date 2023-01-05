@@ -34,12 +34,17 @@ impl Rels{
     Rels{ids: vec![]}
   }
 
+  pub fn new_e<T>(entity: &Entity<T>) -> Self{
+    Rels{ids: vec![entity.id]}
+  }
+
   pub fn add_id(&mut self, id: u64){
     self.ids.push(id);
   }
 
-  pub fn add<T>(&mut self, entity: &Entity<T>){
+  pub fn add<T>(&mut self, entity: &Entity<T>) -> &Self{
     self.ids.push(entity.id);
+    self
   }
 }
 pub struct EntityDB{
@@ -92,14 +97,14 @@ impl<'a> EntityDB{
     let entities = entities.get(&TypeId::of::<T>());
     match entities {
       Some(entities) => {
-        entities.values().into_iter().find_map(|e| {
-          let data = &*e.data.downcast_ref::<T>().unwrap(); // Can unwrap, as the type is guarenteed by the map type of entities
-            let entity = Entity{id: e.id, data: data.clone()};
-            match matcher(&data){
-              true => Some(entity), 
-              false => None
-            }
-        })
+        for e in entities.values(){
+          let e_typed = &*e.data.downcast_ref::<T>().unwrap();
+          if matcher(&e_typed) {
+            let entity = Entity{id: e.id, data: e_typed.clone()};
+            return Some(entity)
+          }
+        }
+        None
       },
       None => None
     }  
