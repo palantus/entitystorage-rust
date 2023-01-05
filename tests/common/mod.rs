@@ -1,6 +1,6 @@
 use entitystorage::{Deserialize, Serialize, Rels};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Point{
     pub x: i32,
     pub y: i32,

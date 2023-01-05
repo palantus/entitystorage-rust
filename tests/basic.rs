@@ -4,7 +4,7 @@ use common::*;
 
 #[test]
 fn insert_and_lookup_again(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
 
   db.add(Person::new("Anders"));
   db.add(Person::new("Kim"));
@@ -27,7 +27,7 @@ fn insert_and_lookup_again(){
 
 #[test]
 fn serialize_json(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(Person::new("Anders"));
   let mut person = db.lookup_id::<Person>(1).unwrap();
   person.data.roles.push("admin".to_owned());
@@ -38,7 +38,7 @@ fn serialize_json(){
 
 #[test]
 fn rels(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(Person::new("Anders"));
   let mut person = db.lookup_id::<Person>(1).unwrap();
   person.data.points.add(&db.add(Point::new(555, 777)));
@@ -49,7 +49,7 @@ fn rels(){
 
 #[test]
 fn search(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(Person::new("Anders"));
   db.add(Person::new("Kim"));
   db.add(Person::new("Bo"));
@@ -60,7 +60,7 @@ fn search(){
 
 #[test]
 fn all(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(Person::new("Anders"));
   db.add(Person::new("Kim"));
   db.add(Person::new("Bo"));
@@ -84,7 +84,7 @@ fn user_roles(){
     roles: Rels
   }
 
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(User{name: "Anders", roles: Rels::new()});
   let mut user = db.lookup_id::<User>(1).unwrap();
   user.data.roles.add(&db.add(Role{name: "Admin", permissions: vec!["user.add", "user.delete"]}));
@@ -95,7 +95,7 @@ fn user_roles(){
 
 #[test]
 fn chaining_and_rels(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   let mut person = db.add(Person::new("Anders"));
   person
     .data

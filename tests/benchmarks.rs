@@ -7,7 +7,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[test]
 #[ignore]
 fn benchmark_lookup_large(){
-  let mut db = EntityDB::new();
+  let db = EntityDB::new();
   db.add(Person::new("Kim"));
 
   let start = Instant::now();
